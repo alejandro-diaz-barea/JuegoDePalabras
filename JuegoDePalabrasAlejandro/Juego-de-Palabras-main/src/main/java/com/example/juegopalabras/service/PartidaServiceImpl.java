@@ -1,0 +1,65 @@
+package com.example.juegopalabras.service;
+
+import com.example.juegopalabras.error.JugadorNotFoundException;
+import com.example.juegopalabras.modelo.Partida;
+import com.example.juegopalabras.repos.RepositorioPartida;
+import lombok.RequiredArgsConstructor;
+import org.springframework.core.io.ClassPathResource;
+import org.springframework.stereotype.Service;
+
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
+import java.util.stream.Collectors;
+
+@Service
+@RequiredArgsConstructor
+public class PartidaServiceImpl implements PartidaService{
+    private final RepositorioPartida partidaRepository;
+
+    @Override
+    public List<Partida> findAll() {
+        return partidaRepository.findAll();
+    }
+
+    @Override
+    public Optional<Partida> findById(Long id) {
+        return partidaRepository.findById(id);
+    }
+
+    @Override
+    public Partida save(Partida partida) {
+        return partidaRepository.save(partida);
+    }
+
+    @Override
+    public void deleteById(Long id) {
+        partidaRepository.deleteById(id);
+    }
+
+    @Override
+    public boolean existsById(Long id) {
+        return partidaRepository.existsById(id);
+    }
+    @Override
+    public List<Partida> findByJugadorId(Long jugadorId) {
+        return partidaRepository.findByJugadorId(jugadorId);
+    }
+    @Override
+    public int getTotalPuntosByJugadorId(Long jugadorId) {
+        List<Partida> partidas = findByJugadorId(jugadorId);
+        if(partidas == null || partidas.isEmpty()){
+            throw new JugadorNotFoundException(jugadorId);
+        }
+        int totalPuntos = 0;
+        for (Partida partida : partidas) {
+            totalPuntos += partida.getPuntuacion();
+        }
+        return totalPuntos;
+    }
+
+}
